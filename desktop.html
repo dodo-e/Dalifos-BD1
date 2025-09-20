@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="pageTitle">browser Dalifos 1 BD1</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="assests/logo.png">
+    <script src="https://kit.fontawesome.com/46d054dd71.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #3498db;
+            color: white;
+            user-select: none;
+            background-image: url('assests/Desktop.png');
+            background-size: cover;
+            background-position: top;
+        }
+
+        .desktop {
+            height: 100vh;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+
+        .icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+            margin: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .icon img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 5px;
+        }
+
+        .window {
+            position: absolute;
+            background-color: #00000046;
+            backdrop-filter: blur(7px);
+            color: #333;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            min-width: 300px;
+            min-height: 200px;
+            max-width: 1330px;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+            resize: both;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .window-header {
+            background-image: linear-gradient(to right, #d316c3, #296ce0);
+            color: white;
+            padding: 5px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .window-title {
+            font-weight: bold;
+        }
+
+        .window-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .window-buttons button {
+            border: none;
+            background: transparent;
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .window-body {
+            background-color: transparent;
+            padding: 10px;
+            overflow: auto;
+            flex-grow: 1;
+            resize: both;
+            min-width: 300px;
+            min-height: 200px;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <a class="icon" href="https://pixlr.com/" target="_blank" title="Pixlr (photoshop online)">
+            <img src="assests/Pixlr-logo.png"><span data-translate="pixlr">Pixlr</span>
+        </a>
+        <a class="icon" href="https://www.google.com/" target="_blank" title="Google">
+            <img src="assests/google-logo.png"><span data-translate="google">Google</span>
+        </a>
+        <a class="icon" href="https://www.microsoft.com/en-ww/microsoft-365/try" target="_blank" title="Office 365 free trial">
+            <img src="assests/Microsoft365-logo.png"><span data-translate="office">Office 365</span>
+        </a>
+        <div class="icon" data-app="settings">
+            <img src="assests/customize.png"><span data-translate="settings">Settings</span>
+        </div>
+        <div class="icon" data-app="player">
+            <img src="assests/player-logo.png"><span data-translate="mediaPlayer">Media Player</span>
+        </div>
+        <div class="icon" data-app="paint">
+            <img src="assests/paint-logo.png"><span data-translate="paint">Paint</span>
+        </div>
+        <div class="icon" data-app="calculator">
+            <img src="assests/calculator-logo.png"><span data-translate="calculator">Calculator</span>
+        </div>
+        <div class="icon" data-app="notepad">
+            <img src="assests/notepad-logo.png"><span data-translate="notepad">Notepad</span>
+        </div>
+    </div>
+
+    <script>
+        const desktop = document.querySelector('.desktop');
+        const icons = document.querySelectorAll('.icon');
+        let zIndexCounter = 1000;
+
+        // --- Language Dictionaries ---
+        const translations = {
+            en: {
+                pageTitle: "browser Dalifos 1 BD1",
+                pixlr: "Pixlr",
+                google: "Google",
+                office: "Office 365",
+                settings: "Settings",
+                "display-edits": "Display and Edits",
+                "desktop-back": "Change Desktop Background",
+                "desktopColor1": "Pick a color or paste an image URL.",
+                mediaPlayer: "Media Player",
+                paint: "Paint",
+                calculator: "Calculator",
+                notepad: "Notepad",
+            }, 
+            ar: {
+                pageTitle: " داليفوس  BD1",
+                pixlr: "بكسلر",
+                google: "جوجل",
+                office: "أوفيس 365",
+                settings: "الإعدادات",
+                "display-edits": "العرض والتعديلات", // Fixed key name
+                "desktop-back": "تغيير خلفية سطح المكتب",
+                "desktopColor1": "اختر لونًا أو الصق رابط صورة.",
+                mediaPlayer: "مشغل الوسائط",
+                paint: "الرسام",
+                calculator: "الآلة الحاسبة",
+                notepad: "المفكرة",
+            }
+        };
+
+        // Function to translate the entire page
+        function setLanguage(lang) {
+            const elementsToTranslate = document.querySelectorAll('[data-translate]');
+            elementsToTranslate.forEach(element => {
+                const key = element.dataset.translate;
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+        }
+
+        // --- Functions for Windows ---
+        function makeDraggable(element) {
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let xOffset = 0;
+            let yOffset = 0;
+
+            const header = element.querySelector('.window-header');
+            if (!header) return;
+
+            header.addEventListener("mousedown", dragStart);
+            desktop.addEventListener("mouseup", dragEnd);
+            desktop.addEventListener("mousemove", drag);
+
+            function dragStart(e) {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+                if (e.target === header || header.contains(e.target)) {
+                    isDragging = true;
+                }
+            }
+            function dragEnd(e) {
+                initialX = currentX;
+                initialY = currentY;
+                isDragging = false;
+            }
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    setTranslate(currentX, currentY, element);
+                }
+            }
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+            }
+        }
+
+        function createWindow(appName, appPath) {
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'window';
+            windowDiv.style.display = 'flex';
+            windowDiv.style.left = '100px';
+            windowDiv.style.top = '100px';
+            windowDiv.style.width = '600px'; 
+            windowDiv.style.height = '400px';
+            windowDiv.style.zIndex = zIndexCounter++;
+
+            fetch(appPath)
+                .then(response => response.text())
+                .then(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const appBody = tempDiv.querySelector('body');
+                    const appContent = appBody ? appBody.innerHTML : html;
+
+                    windowDiv.innerHTML = `
+                        <div class="window-header">
+                            <span class="window-title">${appName}</span>
+                            <div class="window-buttons">
+                                <button class="close-btn">X</button>
+                            </div>
+                        </div>
+                        <div class="window-body">
+                            ${appContent}
+                        </div>
+                    `;
+
+                    desktop.appendChild(windowDiv);
+                    
+                    makeDraggable(windowDiv);
+                    
+                    windowDiv.querySelector('.close-btn').addEventListener('click', () => {
+                        windowDiv.remove();
+                    });
+
+                    // Execute scripts from the loaded content
+                    const scripts = tempDiv.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        windowDiv.appendChild(newScript);
+                    });
+                });
+        }
+
+        // --- Event Listeners ---
+        document.querySelectorAll('.window').forEach(windowDiv => {
+            windowDiv.addEventListener('mousedown', () => {
+                windowDiv.style.zIndex = zIndexCounter++;
+            });
+        });
+
+        icons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                const appName = icon.dataset.app;
+                if (appName) {
+                    e.preventDefault();
+                    
+                    const appPaths = {
+                        'settings': 'programs/settings.html',
+                        'player': 'programs/player.html',
+                        'paint': 'programs/paint.html',
+                        'calculator': 'programs/calculator.html',
+                        'notepad': 'programs/notepad.html'
+                    };
+
+                    createWindow(appName, appPaths[appName]);
+                }
+            });
+        });
+
+        // --- Settings and Language Logic (for main page) ---
+        function loadSettings() {
+            const savedColor = localStorage.getItem('desktopColor');
+            const savedImage = localStorage.getItem('desktopImage');
+            const savedLang = localStorage.getItem('language') || 'en';
+            
+            if (savedImage) { // Check if savedImage exists
+                document.body.style.backgroundImage = `url(${savedImage})`;
+                document.body.style.backgroundColor = '';
+            } else if (savedColor) { // Check if savedColor exists
+                document.body.style.backgroundColor = savedColor;
+                document.body.style.backgroundImage = 'none';
+            } else { // Default if no settings are saved
+                document.body.style.backgroundImage = 'url(assests/Desktop.png)';
+                document.body.style.backgroundColor = '#3498db';
+            }
+            setLanguage(savedLang);
+        }
+
+        window.addEventListener('load', loadSettings);
+
+        // هذا هو الجزء الذي يتلقى رسائل من نوافذ التطبيقات
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'settingsSaved') {
+                const { language, color, image } = event.data;
+                
+                if (image) { // If there is an image, use it
+                    document.body.style.backgroundImage = `url(${image})`;
+                    document.body.style.backgroundColor = '';
+                } else { // Otherwise, use the color
+                    document.body.style.backgroundColor = color;
+                    document.body.style.backgroundImage = 'none';
+                }
+                
+                setLanguage(language);
+            }
+        });
+    </script>
+</body>
+</html>
