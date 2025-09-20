@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint</title>
+    <style>
+        /* New container to manage the layout */
+        .paint-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        #toolbar {
+            padding: 5px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toolbar button, #toolbar input[type="color"], #toolbar input[type="range"] {
+            border: 1px solid #ccc;
+            background-color: #e0e0e0;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        #toolbar button:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* Styling for the clear button to fix its appearance */
+        #clearBtn {
+            border-radius: 5px;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+
+        #canvas {
+            background-color: white;
+            cursor: crosshair;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="paint-container">
+        <div id="toolbar">
+            <input type="color" id="colorPicker" value="#000000">
+            <input type="range" id="sizeSlider" min="1" max="50" value="5">
+            <button id="clearBtn">Clear</button>
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const clearBtn = document.getElementById('clearBtn');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function setCanvasDimensions() {
+            const container = document.querySelector('.paint-container');
+            if (container) {
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+        }
+
+        const resizeObserver = new ResizeObserver(entries => {
+            setCanvasDimensions();
+        });
+        
+        // Use an observer on the new container
+        window.addEventListener('load', () => {
+            const container = document.querySelector('.paint-container');
+            if (container) {
+                resizeObserver.observe(container);
+                setCanvasDimensions();
+            }
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(currentX, currentY);
+            context.strokeStyle = colorPicker.value;
+            context.lineWidth = sizeSlider.value;
+            context.lineCap = 'round';
+            context.stroke();
+
+            lastX = currentX;
+            lastY = currentY;
+        });
+
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+
+        clearBtn.addEventListener('click', () => {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        });
+    </script>
+</body>
+</html>

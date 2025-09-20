@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" href="notepad-logo.png" type="image/x-icon">>
+    <title>D Notepad</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(to right, #d316c3, #296ce0);
+            font-family: 'tajawal', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #input-area, #preview-area {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 16px;
+            line-height: 1.6;
+            border: none;
+        }
+
+        #input-area {
+            background-color: #f8f8f8;
+            border-right: 1px solid #ddd;
+            resize: none;
+            outline: none;
+        }
+
+        #preview-area {
+            background-image: linear-gradient(to right , yellow,orange);
+            color: #333;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <textarea id="input-area" placeholder="Write your text here..."></textarea>
+        <div id="preview-area"></div>
+    </div>
+
+    <script>
+        // Get the input and preview elements from the page
+        const inputArea = document.getElementById('input-area');
+        const previewArea = document.getElementById('preview-area');
+
+        // This function will convert the Markdown to HTML
+        function convertMarkdownToHtml(markdown) {
+            let html = markdown;
+
+            // Simple conversion for bold text: **text** -> <b>text</b>
+            html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            
+            // Simple conversion for headings: # Heading -> <h1>Heading</h1>
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            
+            // Simple conversion for headings: ## Heading -> <h2>Heading</h2>
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+
+            return html;
+        }
+
+        // Listen for user input in the text area
+        inputArea.addEventListener('input', () => {
+            const markdownText = inputArea.value;
+            // Convert the Markdown to HTML and display it in the preview area
+            previewArea.innerHTML = convertMarkdownToHtml(markdownText);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <link rel="shortcut icon" href="player-logo.png" type="image/x-icon">
+    <title>D media player</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(to right, #d316c3, #296ce0);
+            color: #ffffff;
+            font-family: tajawal, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #video-player-container {
+            max-width: 90%;
+            width: 800px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: aquamarine;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        video {
+            background-color: aquamarine;
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        #file-input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #333;
+            background-color: #222;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #file-input:hover {
+            border-color: #007bff;
+            background-image: linear-gradient(to right, #0ce7d5, #296ce0);
+        }
+        label {
+            display: inline-block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>choose video</h2>
+    <input type="file" id="file-input" accept="video/*">
+    <br>
+    <br>
+    <div id="video-player-container">
+        <video id="video-element" controls></video>
+    </div>
+
+    <script>
+        document.getElementById('file-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                const videoElement = document.getElementById('video-element');
+                videoElement.src = fileURL;
+            }
+        });
+    </script>
+
+</body>
+</html>

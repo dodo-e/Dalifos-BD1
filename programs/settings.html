@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: black;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .settings-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .settings-container h1,
+        .settings-container h3 {
+            margin: 0;
+        }
+
+        .settings-container h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .settings-container h3 {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .settings-container p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .settings-container input[type="text"],
+        .settings-container input[type="color"],
+        .settings-container select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        .settings-container button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .settings-container button:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <h1>Display & Edits<i class="fa-solid fa-user-pen"></i></h1>
+        <h3>Change Desktop Background <i class="fa-solid fa-display"></i></h3>
+        <p>Pick a color or paste an image URL.</p>
+        <input type="color" id="bgColorPicker" value="#3498db">
+        <input type="text" id="bgImageInput" placeholder="Image URL (optional)">
+
+        <h1>Date & Language<i class="fa-solid fa-globe"></i></h1>
+        <h3>Change Language<i class="fa-solid fa-language"></i></h3>
+        <p>Note: this setting applies only to the desktop, not applications. For applications, use Google Translate.</p>
+        <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="ar">العربية</option>
+        </select>
+        
+        <button id="saveSettingsBtn">Save</button>
+    </div>
+
+    <script>
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const bgImageInput = document.getElementById('bgImageInput');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const languageSelector = document.getElementById('languageSelector');
+
+        function loadInitialState() {
+            const savedColor = localStorage.getItem('desktopColor');
+            const savedImage = localStorage.getItem('desktopImage');
+            const savedLang = localStorage.getItem('language') || 'en';
+
+            if (savedImage && savedImage !== 'none') {
+                bgImageInput.value = savedImage;
+                bgColorPicker.value = '#3498db'; // Reset to default when image is present
+            } else if (savedColor && savedColor !== 'none') {
+                bgColorPicker.value = savedColor;
+                bgImageInput.value = ''; // Ensure image input is empty
+            }
+            languageSelector.value = savedLang;
+        }
+
+        saveSettingsBtn.addEventListener('click', () => {
+            const newColor = bgColorPicker.value;
+            const newImage = bgImageInput.value.trim();
+            const newLang = languageSelector.value;
+            
+            if (newImage !== '') {
+                localStorage.setItem('desktopImage', newImage);
+                localStorage.setItem('desktopColor', ''); // Set to empty string for clarity
+            } else {
+                localStorage.setItem('desktopColor', newColor);
+                localStorage.setItem('desktopImage', ''); // Set to empty string for clarity
+            }
+
+            localStorage.setItem('language', newLang);
+
+            window.parent.postMessage({ type: 'settingsSaved', language: newLang, color: newColor, image: newImage }, '*');
+        });
+
+        document.addEventListener('DOMContentLoaded', loadInitialState);
+    </script>
+</body>
+</html>
